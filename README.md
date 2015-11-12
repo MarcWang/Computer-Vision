@@ -1,7 +1,8 @@
 # Computer-Vision
 
 ## Sample Projecrt
-* Face Detection
+* Face Detection with OpenCV and Dlib
+* Open Camera on RealSense F200
 
 ## IDE
 
@@ -11,7 +12,8 @@
 
 * MSVC2012
 
-## Dependance Library
+## Dependence Library
 
 * OpenCV 3.0
 * Dlib 18.18
+* Intel RealSense SDK R4
