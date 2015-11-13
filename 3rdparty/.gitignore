@@ -1,0 +1,8 @@
+# 3rdParty Build 
+*dlib/data
+*dlib/include
+*dlib/lib
+
+*opencv/data
+*opencv/include
+*opencv/lib
