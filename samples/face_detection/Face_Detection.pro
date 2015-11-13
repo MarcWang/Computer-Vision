@@ -3,23 +3,13 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp \
-    IFaceCoreModule.cpp \
-    FaceCoreHelper.cpp \
-    AbstractFaceCoreModule.cpp \
-    FaceOpenCVModule.cpp \
-    FaceDlibModule.cpp
-
 INCLUDEPATH += ../../3rdparty
 INCLUDEPATH += ../../3rdparty/opencv/include
 
 #DEFINES += "_ITERATOR_DEBUG_LEVEL=0"
-DEFINES += OS_WIN_VS
-
 
 include(deployment.pri)
-qtcAddDeployment()
-
+include(Face_Detection.inc)
 
 win32-msvc2012{
     !contains(QMAKE_TARGET.arch, x86_64) {
@@ -35,12 +25,6 @@ win32-msvc2012{
     }
 }
 
-HEADERS += \
-    IFaceCoreModule.h \
-    FaceCoreHelper.h \
-    AbstractFaceCoreModule.h \
-    common.h \
-    FaceOpenCVModule.h \
-    FaceDlibModule.h
+
 
 

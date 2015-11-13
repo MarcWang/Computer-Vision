@@ -1,7 +1,6 @@
-#ifndef FACECOREMODULE_H
-#define FACECOREMODULE_H
+#ifndef FACEOPENCVMODULE_H
+#define FACEOPENCVMODULE_H
 #include "AbstractFaceCoreModule.h"
-
 
 class FaceOpenCVModule : public AbstractFaceCoreModule
 {
@@ -16,4 +15,4 @@ private:
     cv::CascadeClassifier cascade;
 };
 
-#endif // FACECOREMODULE_H
+#endif // FACEOPENCVMODULE_H

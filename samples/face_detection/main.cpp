@@ -3,10 +3,15 @@
 #include <FaceOpenCVModule.h>
 #include <FaceDlibModule.h>
 
+void drawFaceInfo( cv::Mat &img, MFaceResult result, int color ){
 
-void drawFaceInfo( cv::Mat &img, MFaceResult opencvResult, MFaceResult dlibResult ){
-
-    std::vector<MFaceInfo> opencvFaces = opencvResult.infos;
+    cv::Scalar drawColor;
+    if( color == 0 ){
+        drawColor = CV_RGB(0,0,255);
+    }else{
+        drawColor = CV_RGB(255,0,0);
+    }
+    std::vector<MFaceInfo> opencvFaces = result.infos;
     for( std::vector<MFaceInfo>::const_iterator r = opencvFaces.begin(); r != opencvFaces.end(); r++ )
     {
         MFaceInfo info = *r;
@@ -17,30 +22,17 @@ void drawFaceInfo( cv::Mat &img, MFaceResult opencvResult, MFaceResult dlibResul
         cv::rectangle( img,
                        cvPoint( left, top ),
                        cvPoint( right, bottom ),
-                       CV_RGB(0,0,255), 3, 8, 0);
-    }
-
-    std::vector<MFaceInfo> dlibFaces = dlibResult.infos;
-    for( std::vector<MFaceInfo>::const_iterator r = dlibFaces.begin(); r != dlibFaces.end(); r++ )
-    {
-        MFaceInfo info = *r;
-        int left = cvRound( info.rect.x );
-        int top = cvRound( info.rect.y );
-        int right = cvRound( info.rect.x + info.rect.width-1 );
-        int bottom = cvRound( info.rect.y + info.rect.height-1 );
-        cv::rectangle( img,
-                       cvPoint( left, top ),
-                       cvPoint( right, bottom ),
-                       CV_RGB(255,0,0), 3, 8, 0);
+                       drawColor, 3, 8, 0);
     }
 }
+
 
 void main()
 {
     cv::VideoCapture cap(1);
 
-    IFaceCoreModule *faceHandler = new FaceOpenCVModule();
-    faceHandler->initialize();
+    IFaceCoreModule *faceOpenCVHandler = new FaceOpenCVModule();
+    faceOpenCVHandler->initialize();
 
     IFaceCoreModule *faceDlibHandler = new FaceDlibModule();
     faceDlibHandler->initialize();
@@ -56,10 +48,10 @@ void main()
         double t = 0;
         t = (double)cvGetTickCount();
         MFaceResult opencvResult;
-        faceHandler->detection( cvImage, opencvResult);
+        faceOpenCVHandler->detection( cvImage, opencvResult);
         t = (double)cvGetTickCount() - t;
         std::cout<<"OpenCV Detect Time = "<< t/1000 <<std::endl;
-
+        drawFaceInfo( cvImage, opencvResult, 1);
 
         double t1 = 0;
         t1 = (double)cvGetTickCount();
@@ -67,12 +59,18 @@ void main()
         faceDlibHandler->detection( cvImage, dlibResult);
         t1 = (double)cvGetTickCount() - t1;
         std::cout<<"Dlib Detect Time = "<< t1/1000 <<std::endl;
-
+        drawFaceInfo( cvImage, dlibResult, 0);
         std::cout<<"---------------------------------------------"<<std::endl;
 
-        drawFaceInfo( cvImage, opencvResult, dlibResult);
         cv::waitKey(1);
         cv::imshow( "result", cvImage );
+    }
+
+    if( faceOpenCVHandler != NULL ){
+        delete faceOpenCVHandler;
+    }
+    if( faceDlibHandler != NULL ){
+        delete faceDlibHandler;
     }
 }
 
