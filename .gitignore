@@ -25,6 +25,3 @@
 *.exe
 *.out
 *.app
-
-# Build
-*samples/face_detection/Release

@@ -6,3 +6,7 @@
 *opencv/data
 *opencv/include
 *opencv/lib
+
+*intel/RSSDK/bin
+*intel/RSSDK/include
+*intel/RSSDK/lib

@@ -1,0 +1,6 @@
+# Project files
+*.user
+
+# Samples Build
+*face_detection/Release
+*realsense_open_camera/Release
