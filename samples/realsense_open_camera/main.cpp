@@ -2,27 +2,11 @@
 #include <pxcsession.h>
 #include <pxccapturemanager.h>
 
-#include <FaceCoreModule.h>
 #include <ImageFormatConverter.h>
 #include <iostream>
 
 #define WIDTH 640
 #define HEIGHT 480
-
-void drawFaceInfo( cv::Mat img, PXCRectI32 rect, PXCFaceData::LandmarkPoint points[] )
-{
-    cv::rectangle(
-        img,
-        cv::Rect(rect.x, rect.y, rect.w, rect.h),
-        cv::Scalar(0, 0, 255)
-    );
-
-    int length = MAX_LANDMARK;
-    for( int p = 0; p < length; p++ ){
-        PXCPointF32 point = points[p].image;
-        cv::circle( img, cv::Point((int)point.x, (int)point.y), 3, cv::Scalar(0, 255, 0), 1, 8, 0);
-    }
-}
 
 void main()
 {
@@ -40,9 +24,6 @@ void main()
 
     psm->EnableStream( PXCCapture::STREAM_TYPE_COLOR, WIDTH, HEIGHT);
     psm->EnableStream( PXCCapture::STREAM_TYPE_DEPTH, WIDTH, HEIGHT);
-
-    MFaceCoreModule *faceHandler = new MFaceCoreModule( psm );
-    faceHandler->initialize();
 
     // Set the coordinate system
     PXCSession *session = psm->QuerySession();
@@ -66,9 +47,6 @@ void main()
         }
         PXCCapture::Sample *sample = psm->QuerySample();
         if( sample ){
-            MFaceResult result;
-            faceHandler->detect( result );
-
             if( sample->color ){
                 colorIm = sample->color;
                 colorMat = converter->convertPXCImageToOpenCVMat( colorIm, ImageFormatConverter::ImageFormat::STREAM_TYPE_COLOR );
@@ -78,18 +56,6 @@ void main()
                 depthMat = converter->convertPXCImageToOpenCVMat( depthIm, ImageFormatConverter::ImageFormat::STREAM_TYPE_DEPTH );
             }
 
-            int counts = result.getFaceCount();
-            for( int i = 0; i < counts; i++ ){
-                MFaceInfo info = result.getFaceInfo(i);
-//                std::cout<<"Face ID = "<< info.id<<std::endl;
-//                std::cout<<"Face Depth = "<<info.depth<<std::endl;
-//                std::cout<<"Face Roll = "<<info.angleRoll<<std::endl;
-//                std::cout<<"Face Yaw = "<<info.angleYaw<<std::endl;
-//                std::cout<<"Face Picth = "<<info.anglePitch<<std::endl;
-//                std::cout<<"Face Smile Score = "<<info.expressSmile<<std::endl;
-//                std::cout<<"Heart Rate = "<<info.heartRate<<std::endl;
-                drawFaceInfo( colorMat, info.rect, info.points );
-            }
             cv::imshow("Color Image on OpenCV Format", colorMat);
             cv::imshow("Depth Image on OpenCV Format", depthMat);
             cv::waitKey(1);

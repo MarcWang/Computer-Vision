@@ -3,10 +3,9 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-INCLUDEPATH += ../../3rdparty
-INCLUDEPATH += ../../3rdparty/opencv/include
-INCLUDEPATH += ../../3rdparty/intel/RSSDK/include
-INCLUDEPATH += ../../3rdparty/intel/RSSDK/include/common
+INCLUDEPATH += $$PWD/../../3rdparty
+INCLUDEPATH += $$PWD/../../3rdparty/opencv/include
+INCLUDEPATH += $$PWD/../../3rdparty/intel/RSSDK/include
 
 include(RealSense.inc)
 
@@ -17,12 +16,9 @@ win32-msvc2012{
             message("QMake Debug Mode")
         } else {
             message("QMake Release Mode")
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/opencv/lib/vc11/lib/opencv_ts300.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/opencv/lib/vc11/lib/opencv_world300.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/intel/RSSDK/lib/Win32/libpxc.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/intel/RSSDK/lib/Win32/libpxcmd.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/intel/RSSDK/lib/Win32/common/libpxcutils.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/intel/RSSDK/lib/Win32/common/libpxcutilsmd.lib
+            LIBS += $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_ts300.lib
+            LIBS += $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_world300.lib
+            LIBS += $$PWD/../../3rdparty/intel/RSSDK/lib/Win32/libpxc.lib
         }
     }
 }
