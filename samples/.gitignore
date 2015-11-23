@@ -4,3 +4,6 @@
 # Samples Build
 *face_detection/Release
 *realsense_open_camera/Release
+*realsense_face_detection/Release
+*opencv_mat_control/Release
+*opencv_facial_recognition/Release
