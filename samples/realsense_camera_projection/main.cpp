@@ -8,6 +8,9 @@
 #define WIDTH 640
 #define HEIGHT 480
 
+#define MIN_DISTANCE 100
+#define MAX_DISTANCE 200
+
 void PlotXY(pxcBYTE *cpixels, int xx, int yy, int cwidth, int cheight, int dots, int color) {
     if (xx < 0 || xx >= cwidth || yy < 0 || yy >= cheight) return;
 
@@ -34,53 +37,75 @@ void PlotXY(pxcBYTE *cpixels, int xx, int yy, int cwidth, int cheight, int dots,
 
 void DepthToColorByUVMAP(PXCProjection *projection, PXCImage *color, PXCImage *depth, int dots, pxcU16 invalid_value)
 {
+    pxcStatus sts = PXC_STATUS_NO_ERROR;
     if ( !color || !depth ){
         return;
     }
     PXCImage::ImageInfo cinfo = color->QueryInfo();
 
-    /* Retrieve the color pixels */
     PXCImage::ImageData cdata;
-    pxcStatus sts = color->AcquireAccess( PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_RGB32, &cdata);
-    if( sts >= PXC_STATUS_NO_ERROR ){
-        int cwidth = cdata.pitches[0]/sizeof(int); /* aligned width */
-        pxcBYTE *cpixels = cdata.planes[0];
+    sts = color->AcquireAccess( PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_RGB32, &cdata);
+    if( sts != PXC_STATUS_NO_ERROR ){
+        color->ReleaseAccess(&cdata);
+        std::cout<<"color->AcquireAccess error"<<std::endl;
+        return;
+    }
+    pxcBYTE *cpixels = cdata.planes[0];
+    int cwidth = cdata.pitches[0]/sizeof(int); /* aligned width */
 
-        PXCImage::ImageInfo dinfo = depth->QueryInfo();
-        PXCPointF32 *uvmap = new PXCPointF32[dinfo.width*dinfo.height];
+    PXCImage::ImageInfo dinfo = depth->QueryInfo();
+    PXCPointF32 *uvmap = new PXCPointF32[dinfo.width*dinfo.height];
 
-        /* Retrieve the depth pixels and uvmap */
-        PXCImage::ImageData ddata;
-        if( depth->AcquireAccess( PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_DEPTH, &ddata ) >= PXC_STATUS_NO_ERROR ) {
-            pxcU16 *dpixels = (pxcU16*)ddata.planes[0];
-            int dpitch = ddata.pitches[0]/sizeof(pxcU16); /* aligned width */
 
-            sts = projection->QueryUVMap(depth, uvmap);
-            if(sts>=PXC_STATUS_NO_ERROR) {
-                int uvpitch = depth->QueryInfo().width;
+    PXCImage::ImageData ddata;
+    sts = depth->AcquireAccess( PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_DEPTH, &ddata);
+    if( sts != PXC_STATUS_NO_ERROR ){
+        color->ReleaseAccess(&cdata);
+        depth->ReleaseAccess(&ddata);
+        delete[] uvmap;
+        std::cout<<"depth->AcquireAccess error"<<std::endl;
+        return;
+    }
+    pxcU16 *dpixels = (pxcU16*)ddata.planes[0];
+    int dpitch = ddata.pitches[0]/sizeof(pxcU16); /* aligned width */
 
-                /* Draw dots onto the color pixels */
-                for (int y = 0; y < (int)dinfo.height; y++) {
-                    for (int x = 0; x < (int)dinfo.width; x++) {
-                        pxcU16 d = dpixels[y*dpitch+x];
-                        if (d == invalid_value) continue; // no mapping based on unreliable depth values
 
-                        float uvx = uvmap[y*uvpitch+x].x;
-                        float uvy = uvmap[y*uvpitch+x].y;
-                        int xx = (int)(uvx * cwidth + 0.5f), yy = (int)(uvy * cinfo.height + 0.5f);
-                        if (xx >= 0 && xx < cwidth && yy >= 0 && yy < cinfo.height)
-                        {
-                            PlotXY(cpixels, xx, yy, cwidth, cinfo.height, dots, color?1:0);
-                        }
-                    }
+    sts = projection->QueryUVMap(depth, uvmap);
+    if( sts != PXC_STATUS_NO_ERROR ){
+        color->ReleaseAccess(&cdata);
+        depth->ReleaseAccess(&ddata);
+        delete[] uvmap;
+        std::cout<<"projection->QueryUVMap error"<<std::endl;
+        return;
+    }
+    int uvpitch = depth->QueryInfo().width;
+
+    for (int y = 0; y < (int)dinfo.height; y++) {
+        for (int x = 0; x < (int)dinfo.width; x++) {
+            pxcU16 d = dpixels[y*dpitch+x];
+            if( MIN_DISTANCE < d && d < MAX_DISTANCE ){
+
+                if (d == invalid_value) continue; // no mapping based on unreliable depth values
+
+                float uvx = uvmap[y*uvpitch+x].x;
+                float uvy = uvmap[y*uvpitch+x].y;
+                int xx = (int)(uvx * cwidth + 0.5f);
+                int yy = (int)(uvy * cinfo.height + 0.5f);
+
+                if (xx >= 0 && xx < cwidth && yy >= 0 && yy < cinfo.height)
+                {
+                    PlotXY(cpixels, xx, yy, cwidth, cinfo.height, dots, color?1:0);
                 }
             }
-            depth->ReleaseAccess(&ddata);
         }
-        delete[] uvmap;
-        color->ReleaseAccess(&cdata);
     }
+
+    depth->ReleaseAccess(&ddata);
+    color->ReleaseAccess(&cdata);
+    delete[] uvmap;
+
 }
+
 
 void main()
 {
@@ -106,12 +131,11 @@ void main()
     }
 
     PXCCapture::Device *device = psm->QueryCaptureManager()->QueryDevice();
+    pxcU16 invalid_value = device->QueryDepthLowConfidenceValue();
     PXCProjection *projection = NULL;
     projection = device->CreateProjection();
-    pxcU16 invalid_value = device->QueryDepthLowConfidenceValue();
 
     PXCImage *colorIm, *depthIm;
-//    projection->CreateDepthImageMappedToColor( depthIm, colorIm);
 
     while(true){
         if( psm->AcquireFrame(true) < PXC_STATUS_NO_ERROR ){
