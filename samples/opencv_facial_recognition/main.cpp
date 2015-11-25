@@ -90,10 +90,15 @@ void main()
             cv::Mat resizeMat;
             cv::resize(faceMat, resizeMat, cv::Size(FEATURE_SIZE, FEATURE_SIZE), 1.0, 1.0, cv::INTER_CUBIC);
 
-            int prediction = model->predict(resizeMat);
+
+            int predictedLabel = -1;
+            double confidence = 0.0;
+            model->predict( resizeMat, predictedLabel, confidence );
+
+//            int prediction = model->predict(resizeMat);
 
             cv::rectangle(camMat, face_i, CV_RGB(0, 255,0), 1);
-            std::string box_text = cv::format("Prediction = %d", prediction);
+            std::string box_text = cv::format("Prediction = %d, Confidence = %d", predictedLabel, (int)confidence);
             int pos_x = std::max(face_i.tl().x - 10, 0);
             int pos_y = std::max(face_i.tl().y - 10, 0);
             cv::putText(camMat, box_text, cv::Point(pos_x, pos_y), cv::FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0,255,0), 2.0);

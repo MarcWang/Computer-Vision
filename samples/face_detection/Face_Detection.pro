@@ -3,8 +3,8 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-INCLUDEPATH += ../../3rdparty
-INCLUDEPATH += ../../3rdparty/opencv/include
+INCLUDEPATH += $$PWD/../../3rdparty
+INCLUDEPATH += $$PWD/../../3rdparty/opencv/include
 
 #DEFINES += "_ITERATOR_DEBUG_LEVEL=0"
 
@@ -18,9 +18,9 @@ win32-msvc2012{
             message("QMake Debug Mode")
         } else {
             message("QMake Release Mode")
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/opencv/lib/vc11/lib/opencv_ts300.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/opencv/lib/vc11/lib/opencv_world300.lib
-            LIBS += C:/work/Projects/GitHub/Computer-Vision/3rdparty/dlib/lib/vc11/dlib.lib
+            $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_ts300.lib
+            $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_world300.lib
+            $$PWD/../../3rdparty/dlib/lib/vc11/dlib.lib
         }
     }
 }
