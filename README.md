@@ -6,22 +6,28 @@
 Computer-Vision
 ├── samples
 │   └── face_detection
-│	└── 		....
-│	└── realsense_open_camera
+│   └── 		....
+│   └── realsense_open_camera
 │
+├── demo
 ├── 3rdparty
-│	└── dlib
-│	└── opencv
-│	└── intel
+│   └── dlib
+│   └── opencv
+│   └── intel
 ```
 
 
 ### **Sample Projecrt**
-* Face Detection with OpenCV and Dlib
-* Open Camera on RealSense F200
-* Facial Recognition using OpenCV
-* Face Detection using RealSense SDK
-* Compare access mat on OpenCV
+name                             | description          
+---------------------------------|----------------------------
+face_detection                   | compare opencv and dlib                   
+dlib_object_tracking             | implement object tracker using dlib                  
+opencv_facial_recognition        | implement facial recognition using opencv
+opencv_mat_control               | compare methods for mat of control on opencv
+realsense_camera_projection      | implement camera projection using realsense on F200
+realsense_face_detection         | implement face detection using realsense SDK
+realsense_open_camera            | open camera on F200
+
 
 ### **IDE**
 * QT 5.4.2
@@ -34,6 +40,8 @@ Computer-Vision
 * Dlib 18.18
 * Intel RealSense SDK R4
 
+### **Tools**
+* CMake
 
 ### **Download**
 * [opencv](https://github.com/Itseez/opencv)
@@ -49,3 +57,5 @@ cd build
 cmake -G "Visual Studio 11 2012" ..
 cmake --build . --config Release
 ```
+
+

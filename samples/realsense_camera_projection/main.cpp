@@ -32,7 +32,7 @@ void PlotXY(pxcBYTE *cpixels, int xx, int yy, int cwidth, int cheight, int dots,
     cpixels[(lyy + xx) * 4 + color] = 0xFF; /* 1 dot */
 }
 
-void DepthToColorByUVMAP(PXCProjection *projection, PXCImage *color, PXCImage *depth, int dots)
+void DepthToColorByUVMAP(PXCProjection *projection, PXCImage *color, PXCImage *depth, int dots, pxcU16 invalid_value)
 {
     if ( !color || !depth ){
         return;
@@ -52,8 +52,8 @@ void DepthToColorByUVMAP(PXCProjection *projection, PXCImage *color, PXCImage *d
         /* Retrieve the depth pixels and uvmap */
         PXCImage::ImageData ddata;
         if( depth->AcquireAccess( PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_DEPTH, &ddata ) >= PXC_STATUS_NO_ERROR ) {
-            pxcU16 *dpixels=(pxcU16*)ddata.planes[0];
-            int   dpitch = ddata.pitches[0]/sizeof(pxcU16); /* aligned width */
+            pxcU16 *dpixels = (pxcU16*)ddata.planes[0];
+            int dpitch = ddata.pitches[0]/sizeof(pxcU16); /* aligned width */
 
             sts = projection->QueryUVMap(depth, uvmap);
             if(sts>=PXC_STATUS_NO_ERROR) {
@@ -63,7 +63,7 @@ void DepthToColorByUVMAP(PXCProjection *projection, PXCImage *color, PXCImage *d
                 for (int y = 0; y < (int)dinfo.height; y++) {
                     for (int x = 0; x < (int)dinfo.width; x++) {
                         pxcU16 d = dpixels[y*dpitch+x];
-//                        if (d == invalid_value) continue; // no mapping based on unreliable depth values
+                        if (d == invalid_value) continue; // no mapping based on unreliable depth values
 
                         float uvx = uvmap[y*uvpitch+x].x;
                         float uvy = uvmap[y*uvpitch+x].y;
@@ -108,6 +108,7 @@ void main()
     PXCCapture::Device *device = psm->QueryCaptureManager()->QueryDevice();
     PXCProjection *projection = NULL;
     projection = device->CreateProjection();
+    pxcU16 invalid_value = device->QueryDepthLowConfidenceValue();
 
     PXCImage *colorIm, *depthIm;
 //    projection->CreateDepthImageMappedToColor( depthIm, colorIm);
@@ -126,7 +127,7 @@ void main()
             }
         }
 
-        DepthToColorByUVMAP(projection, colorIm, depthIm, 9);
+        DepthToColorByUVMAP(projection, colorIm, depthIm, 9, invalid_value);
 
         if (!renderColor->RenderFrame(colorIm)) break;
         if (!renderDepth->RenderFrame(depthIm)) break;
