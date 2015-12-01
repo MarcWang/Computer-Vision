@@ -1,0 +1,5 @@
+3RDPARTY = $$PWD/../3rdparty
+
+OPENCV = $$3RDPARTY/opencv
+DLIB = $$3RDPARTY/dlib
+REALSENSE = $$3RDPARTY/intel
