@@ -1,5 +1,11 @@
 # Project files
 *.user
+*.tmp
+*.Debug
+*.Release
+*release
+*debug
 *Release
+*Makefile
 
 # Samples Build
