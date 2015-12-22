@@ -5,7 +5,7 @@ CONFIG -= app_bundle qt
 CONFIG(debug, debug|release):BUILD_MODE = debug
 else:BUILD_MODE = release
 
-include(opencv_machine_learning.pri)
+include(opencv_license_plate_recognition.pri)
 
 ## 3rdParty Include
 ############################################################
@@ -24,15 +24,14 @@ MOC_DIR     = $${TMP_DIR}
 RCC_DIR     = $${TMP_DIR}
 OBJECTS_DIR = $${TMP_DIR}
 
-OPENCV_DLL_PATH = $${PWD}/../../3rdparty/opencv/lib/vc11/bin
-#IMAGE_PATH      = $${PWD}/../../3rdparty/data/images
-BUILD_DIR       = $${DESTDIR}
+OPENCV_DLL_PATH             = $${PWD}/../../3rdparty/opencv/lib/vc11/bin
+OPENCV_DATA_HAAR_PATH = $${PWD}/../../3rdparty/opencv/data/haarcascades
+BUILD_DIR                   = $${DESTDIR}
 
 ## File Setting
 ############################################################
 OPENCV_DLLS = opencv_world300.dll
-CMD_BAT = camera_train_and_predict.bat
-#IMAGE       = lena.jpg
+OPENCV_DATA_HAAR = haarcascade_licence_plate_rus_16stages.xml haarcascade_russian_plate_number.xml
 
 ## Platform Setting
 ############################################################
@@ -43,17 +42,14 @@ win32-msvc2012{
             message("QMake Debug Mode")
         } else {
             message("QMake Release Mode")
-#            LIBS += $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_ts300.lib
             LIBS += $$PWD/../../3rdparty/opencv/lib/vc11/lib/opencv_world300.lib
 
             for( files, OPENCV_DLLS ):eval( QMAKE_POST_LINK += xcopy /R /Q /Y /I $$replace( OPENCV_DLL_PATH, /, \\ )\\$${files} $$replace( BUILD_DIR, /, \\ ) & )
             export(QMAKE_POST_LINK)
 
-            for( files, CMD_BAT ):eval( QMAKE_POST_LINK += xcopy /R /Q /Y /I $$replace( BASE, /, \\ )\\$${files} $$replace( BUILD_DIR, /, \\ ) & )
+            for( files, OPENCV_DATA_HAAR ):eval( QMAKE_POST_LINK += xcopy /R /Q /Y /I $$replace( OPENCV_DATA_HAAR_PATH, /, \\ )\\$${files} $$replace( BUILD_DIR, /, \\ ) & )
             export(QMAKE_POST_LINK)
 
-#            for( files, IMAGE ):eval( QMAKE_POST_LINK += xcopy /R /Q /Y /I $$replace( IMAGE_PATH, /, \\ )\\$${files} $$replace( BUILD_DIR, /, \\ ) & )
-#            export(QMAKE_POST_LINK)
         }
     }
 }

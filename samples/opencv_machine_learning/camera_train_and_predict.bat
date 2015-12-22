@@ -1,0 +1,1 @@
+.\opencv_machine_learning.exe camera 2

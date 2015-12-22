@@ -13,6 +13,9 @@ Computer-Vision
 ├── 3rdparty
 │   └── dlib
 │   └── opencv
+│       └── data
+│           └── haarcascades
+│           └── lbpcascades
 │   └── intel
 ```
 
@@ -23,7 +26,13 @@ name                             | description
 face_detection                   | compare opencv and dlib                   
 dlib_object_tracking             | implement object tracker using dlib                  
 opencv_facial_recognition        | implement facial recognition using opencv
+opencv_human_detection           | implement human detection using HOG and Haar feature using opencv
 opencv_mat_control               | compare methods for mat of control on opencv
+opencv_license_plate_recognition | 
+opencv_machine_learning          | 
+opencv_open_camera               | 
+opencv_using_gpu                 | 
+opencv_text_recognition          | 
 realsense_camera_projection      | implement camera projection using realsense on F200
 realsense_face_detection         | implement face detection using realsense SDK
 realsense_open_camera            | open camera on F200
@@ -58,4 +67,8 @@ cmake -G "Visual Studio 11 2012" ..
 cmake --build . --config Release
 ```
 
-
+### **Build OpenCV**
+```bat
+cmake -G "Visual Studio 11 2012" .. -DOPENCV_EXTRA_MODULES_PATH=...\opencv\sources\modules\contrib\modules ...\opencv\sources
+cmake --build . --config Release
+```

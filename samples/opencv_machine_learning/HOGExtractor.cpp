@@ -1,6 +1,6 @@
 #include "HOGExtractor.h"
 #include <iostream>
-
+#include <fstream>
 
 
 HOGParams::HOGParams()
@@ -36,6 +36,26 @@ void HOGExtractor::initialize( HOGParams params, int width, int height )
     _hog     = new cv::HOGDescriptor( _winSize, _params.blockSize, _params.blockStrideSize, _params.cellSize, _params.bins );
 }
 
+void HOGExtractor::setSVM(const char *path)
+{
+    std::vector<float> x;
+    std::ifstream fileIn( path, std::ios::in);
+    float val = 0.0f;
+    while(!fileIn.eof())
+    {
+        fileIn>>val;
+        x.push_back(val);
+    }
+    x.pop_back();
+    fileIn.close();
+    _hog->setSVMDetector( x );
+}
+
+void HOGExtractor::setSVM(std::vector<float> detector)
+{
+    _hog->setSVMDetector( detector );
+}
+
 void HOGExtractor::extract( cv::Mat frame, cv::Mat &resMat )
 {
     if( _hog == NULL ){
@@ -53,14 +73,19 @@ void HOGExtractor::extract( cv::Mat frame, cv::Mat &resMat )
 
     int dims = descriptors.size();
 
-    std::cout<<"Dims = "<<dims<<std::endl;
-
     resMat.release();
     resMat = cv::Mat(1, dims, CV_32FC1);
     float* data = resMat.ptr<float>(0);
     for( int j = 0; j < dims; j++){
         data[j]= descriptors[j];
     }
+}
+
+void HOGExtractor::detect(cv::Mat frame, std::vector<cv::Rect> &result)
+{
+    cv::Size winShiftSize = cv::Size( 20, 20 );//搜尋框移動位置
+    cv::Size paddingSize = cv::Size( 0, 0 );//補滿邊界位置
+    _hog->detectMultiScale( frame, result, 0, winShiftSize, paddingSize, 1.2, 2);
 }
 
 

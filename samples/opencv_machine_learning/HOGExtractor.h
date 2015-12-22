@@ -18,7 +18,10 @@ public:
     HOGExtractor();
     ~HOGExtractor();
     void initialize( HOGParams params, int width, int height );
+    void setSVM( const char* path );
+    void setSVM( std::vector< float > detector );
     void extract( cv::Mat frame, cv::Mat &resMat );
+    void detect( cv::Mat frame, std::vector<cv::Rect> &result );
 
 private:
     cv::Size _winSize;
